@@ -241,8 +241,6 @@ export class Parser {
         case TokenType.IF:
         case TokenType.WHILE:
         case TokenType.PRINT:
-        case TokenType.WHILE:
-        case TokenType.PRINT:
         case TokenType.RETURN:
           return;
       }

@@ -6,7 +6,9 @@ export class PassThroughtPrinter implements Printer {
 
   callback: ((line: string) => void)
 
-  constructor(callback: ((line: string) => void) = () => {}) {
+  constructor(callback: ((line: string) => void) = () => {
+    // default empty function
+  }) {
     this.callback = callback;
   }
 
