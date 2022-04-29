@@ -6,16 +6,16 @@ on:
 jobs: 
   test:
     runs-on: ubuntu-latest
-  steps:
-    - name: Check out repository code
-      uses: actions/checkout@v3
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with: 
-        node-version: 16
-    - run: npm install
-    - run: npm test
-    - name: Generating coverage badges
-      uses: jpb06/jest-badges-action@latest
-      with:
-        branches: master
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with: 
+          node-version: 16
+      - run: npm install
+      - run: npm test
+      - name: Generating coverage badges
+        uses: jpb06/jest-badges-action@latest
+        with:
+          branches: master
