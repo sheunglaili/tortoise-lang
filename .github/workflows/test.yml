@@ -23,6 +23,7 @@ jobs:
         with: 
           auto_fix: true
           eslint: true
+          eslint_extensions: ts,js
   test:
     runs-on: ubuntu-latest
     steps:
@@ -37,7 +38,7 @@ jobs:
       - run: npm test -- --coverage --ci
       - uses: codecov/codecov-action@v2
   deploy: 
-    needs: ['test']
+    needs: ['test', 'lint']
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
