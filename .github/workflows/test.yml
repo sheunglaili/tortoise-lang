@@ -16,4 +16,5 @@ jobs:
       - run: npm install
       - run: npm test -- --coverage --ci
       - uses: codecov/codecov-action@v2
-        files: ./coverage/coverage-summary.json
+        with:
+          files: ./coverage/coverage-summary.json
