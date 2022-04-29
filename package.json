@@ -3,17 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.0.1",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.4.1",
-    "@types/node": "^16.11.27",
-    "@types/react": "^18.0.5",
-    "@types/react-dom": "^18.0.1",
+    "@uiw/react-codemirror": "^4.6.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-scripts": "5.0.1",
-    "typescript": "^4.6.3",
+    "react-split": "^2.0.14",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -28,6 +22,11 @@
       "react-app/jest"
     ]
   },
+  "jest": {
+    "moduleNameMapper": {
+      "tortoise/(.*)": "<rootDir>/src/tortoise/$1"
+    }
+  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -39,5 +38,16 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.0.1",
+    "@testing-library/user-event": "^14.1.0",
+    "@types/jest": "^27.4.1",
+    "@types/node": "^17.0.24",
+    "@types/react": "^18.0.5",
+    "@types/react-dom": "^18.0.1",
+    "jest": "^23.6.0",
+    "typescript": "^4.6.3"
   }
 }
