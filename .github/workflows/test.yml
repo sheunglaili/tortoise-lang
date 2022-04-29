@@ -1,4 +1,4 @@
-name: Test
+name: Test, build and deploy
 on:
   push:
   pull_request:
@@ -13,6 +13,22 @@ jobs:
         uses: actions/setup-node@v3
         with: 
           node-version: 16
+          cache: 'npm'
       - run: npm install
       - run: npm test -- --coverage --ci
       - uses: codecov/codecov-action@v2
+  deploy: 
+    needs: ['test']
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with: 
+          node-version: 16
+          cache: 'npm'
+      - run: npm install
+      - run: npm run deploy
+
