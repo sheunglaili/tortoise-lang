@@ -2,7 +2,7 @@ import { RuntimeError } from "./error";
 import { Token } from "./token";
 
 export class Environment {
-  private readonly values = new Map<String, any>();
+  private readonly values = new Map<string, any>();
 
   define(name: string, value: any) {
     this.values.set(name, value);
