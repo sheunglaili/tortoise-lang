@@ -23,6 +23,9 @@
     ]
   },
   "jest": {
+    "coverageReporters": [
+      "json-summary"
+    ],
     "moduleNameMapper": {
       "tortoise/(.*)": "<rootDir>/src/tortoise/$1"
     }
