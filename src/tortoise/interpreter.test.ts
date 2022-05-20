@@ -209,51 +209,66 @@ test.each([
 test.each([
   {
     description: "false and true",
-    input: new Expr.Logical(
-      new Expr.Literal(false),
-      new Token(TokenType.AND, "and", null, 1),
-      new Expr.Literal(true)
-    ),
-    expected: false
+    input: [
+      new Stmt.Print(new Expr.Logical(
+        new Expr.Literal(false),
+        new Token(TokenType.AND, "and", null, 1),
+        new Expr.Literal(true)
+      ))
+    ],
+    expected: "false"
   },
   {
     description: "false and false",
-    input: new Expr.Logical(
-      new Expr.Literal(false),
-      new Token(TokenType.AND, "and", null, 1),
-      new Expr.Literal(false)
-    ),
-    expected: false
+    input: [
+      new Stmt.Print(
+        new Expr.Logical(
+          new Expr.Literal(false),
+          new Token(TokenType.AND, "and", null, 1),
+          new Expr.Literal(false)
+        )
+      )
+    ],
+    expected: "false"
   },
   {
     description: "true and false",
-    input: new Expr.Logical(
-      new Expr.Literal(true),
-      new Token(TokenType.AND, "and", null, 1),
-      new Expr.Literal(false)
-    ),
-    expected: false
+    input: [new Stmt.Print(
+      new Expr.Logical(
+        new Expr.Literal(true),
+        new Token(TokenType.AND, "and", null, 1),
+        new Expr.Literal(false)
+      )
+    )],
+    expected: "false"
   },
   {
     description: "true or false",
-    input: new Expr.Logical(
-      new Expr.Literal(true),
-      new Token(TokenType.OR, "or", null, 1),
-      new Expr.Literal(false)
-    ),
-    expected: true
-  }, 
+    input: [
+      new Stmt.Print(
+        new Expr.Logical(
+          new Expr.Literal(true),
+          new Token(TokenType.OR, "or", null, 1),
+          new Expr.Literal(false)
+        )
+      )
+    ],
+    expected: "true"
+  },
   {
     description: "false or true",
-    input: new Expr.Logical(
-      new Expr.Literal(false),
-      new Token(TokenType.OR, "or", null, 1),
-      new Expr.Literal(true)
-    ),
-    expected: true
+    input: [new Stmt.Print(
+      new Expr.Logical(
+        new Expr.Literal(false),
+        new Token(TokenType.OR, "or", null, 1),
+        new Expr.Literal(true)
+      )
+    )],
+    expected: "true"
   }
 ])("visit logical expression: $description should intepret value: $expected", ({ input, expected }) => {
-  expect(interpreter.visitLogicalExpr(input)).toEqual(expected);
+  interpreter.interpret(input);
+  expect(printer.write).toBeCalledWith(expected);
 });
 
 test.each([
@@ -515,8 +530,66 @@ test.each([
     assertion: () => {
       expect(printer.write).toBeCalledWith("false")
     }
+  },
+  {
+    description: "should not run any branch", 
+    statements: [
+      new Stmt.If(
+        new Expr.Literal(false),
+        new Stmt.Print(new Expr.Literal("no one should ever reach here")),
+        null
+      )
+    ],
+    assertion: () => {
+      expect(printer.write).not.toBeCalled();
+    }
   }
 ])("should interpret if-else statment: $description", ({ statements, assertion }) => {
   interpreter.interpret(statements);
   assertion();
 });
+
+test.each([
+  {
+    description: "while loop with block stmt body",
+    statements: [
+      new Stmt.Var(
+        new Token(TokenType.IDENTIFIER, "a", null, 1),
+        new Expr.Literal(1)
+      ),
+      new Stmt.While(
+        new Expr.Binary(
+          new Expr.Variable(
+            new Token(TokenType.IDENTIFIER, "a", null, 2)
+          ),
+          new Token(TokenType.LESS_EQUAL, "<", null, 2),
+          new Expr.Literal(3) 
+        ),
+        new Stmt.Block([
+          new Stmt.Print(
+            new Expr.Variable(
+              new Token(TokenType.IDENTIFIER, "a", null, 3)
+            )
+          ),
+          new Stmt.Expression(
+            new Expr.Assign(
+              new Token(TokenType.IDENTIFIER, "a", null, 4),
+              new Expr.Binary(
+                new Expr.Variable(new Token(TokenType.IDENTIFIER, "a", null, 4)),
+                new Token(TokenType.PLUS, "+", null, 4),
+                new Expr.Literal(1)
+              )
+            )
+          )
+        ])
+      )
+    ],
+    assertion: () => {
+      expect(printer.write).toHaveBeenNthCalledWith(1,"1");
+      expect(printer.write).toHaveBeenNthCalledWith(2,"2");
+    }
+  }
+])("should interpret while statement: $description", ({ statements, assertion }) => {
+  interpreter.interpret(statements);
+  assertion();
+})

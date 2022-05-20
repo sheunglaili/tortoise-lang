@@ -17,6 +17,12 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
     this.printer = printer;
     this.environment = new Environment();
   }
+
+  visitWhileStmt(stmt: Stmt.While): void {
+    while(this.isTruthy(this.evaluate(stmt.condition))) {
+      this.execute(stmt.body);
+    }
+  }
   
   visitLogicalExpr(expr: Expr.Logical) {
     const left = this.evaluate(expr.left);
@@ -50,12 +56,6 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
   visitVarStmt(stmt: Stmt.Var): void {
     const value = stmt.initializer != null ? this.evaluate(stmt.initializer) : null;
     this.environment.define(stmt.name.lexeme, value);
-  }
-  visitLiteralStmt(stmt: Stmt.Literal): void {
-    throw new Error("Method not implemented.");
-  }
-  visitUnaryStmt(stmt: Stmt.Unary): void {
-    throw new Error("Method not implemented.");
   }
   visitExpressionStmt(stmt: Stmt.Expression): void {
     this.evaluate(stmt.expression);

@@ -27,8 +27,7 @@ class GenerateAst {
         "If         : condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null",
         "Print      : expression: Expr",
         "Var        : name: Token, initializer: Expr | null",
-        "Literal    : value: any", 
-        "Unary      : operator: Token, right: Expr",
+        "While      : condition: Expr, body: Stmt"
       ],
       [
         "import { Token } from 'tortoise/token';",

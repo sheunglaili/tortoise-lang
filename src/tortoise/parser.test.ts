@@ -616,6 +616,37 @@ test.each([
   expect(statments).toEqual(expected)
 })
 
+test("should parse while statement", () => {
+  const parser = new Parser([
+    new Token(TokenType.VAR, "var", null, 1),
+    new Token(TokenType.IDENTIFIER, "a", null, 1),
+    new Token(TokenType.EQUAL, "=", null, 1),
+    new Token(TokenType.TRUE, "true", null, 1),
+    new Token(TokenType.SEMICOLON, ";", null, 1),
+    new Token(TokenType.WHILE, "while", null, 2),
+    new Token(TokenType.LEFT_PAREN, "(", null, 2),
+    new Token(TokenType.IDENTIFIER, "a", null, 2),
+    new Token(TokenType.RIGHT_PAREN, ")", null, 2),
+    new Token(TokenType.IDENTIFIER, "a", null, 3),
+    new Token(TokenType.EQUAL, "=", null, 3),
+    new Token(TokenType.FALSE, "false", false, 3),
+    new Token(TokenType.SEMICOLON, ";", null, 3),
+    new Token(TokenType.EOF, "", null, 3)
+  ], monitor);
+
+  const stmts = parser.parse();
+
+  expect(stmts[1] instanceof Stmt.While).toEqual(true);
+  const whileStmt = stmts[1] as Stmt.While;
+  expect(whileStmt.condition).toEqual(new Expr.Variable(new Token(TokenType.IDENTIFIER, "a", null, 2)));
+  expect(whileStmt.body).toEqual(
+    new Stmt.Expression(
+      new Expr.Assign(
+        new Token(TokenType.IDENTIFIER, "a", null, 3),
+        new Expr.Literal(false)
+      )))
+})
+
 test("should print error if var declaration is not ended with ;", () => {
   const parser = new Parser(
     [

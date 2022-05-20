@@ -10,6 +10,7 @@ import { Stmt } from "./stmt";
  * declaration    → varDecl | statement ;
  * varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
  * statement      → exprStmt | ifStmt | printStmt | block ;
+ * whileStmt      → "while" "(" expression ")" statement ;
  * ifStmt         → "if" "(" expression ")" statement ( "else" statement )?;
  * block          → "{" declaration* "}"
  * exprStmt       → expression ";" ;
@@ -243,9 +244,19 @@ export class Parser {
     return new Stmt.If(condition, thenBranch, elseBracnch);
   }
 
+  private whileStatement(): Stmt {
+    this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
+    const condition = this.expression();
+    this.consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
+    const body = this.statement();
+
+    return new Stmt.While(condition, body);
+  }
+
   private statement(): Stmt {
     if (this.match(TokenType.IF)) return this.ifStatement();
     if (this.match(TokenType.PRINT)) return this.printStatement();
+    if (this.match(TokenType.WHILE)) return this.whileStatement();
     if (this.match(TokenType.LEFT_BRACE)) return this.block();
 
     return this.expressionStatement();

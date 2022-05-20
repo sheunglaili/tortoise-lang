@@ -12,8 +12,7 @@ export namespace Stmt {
     visitIfStmt(stmt: Stmt.If): R;
     visitPrintStmt(stmt: Stmt.Print): R;
     visitVarStmt(stmt: Stmt.Var): R;
-    visitLiteralStmt(stmt: Stmt.Literal): R;
-    visitUnaryStmt(stmt: Stmt.Unary): R;
+    visitWhileStmt(stmt: Stmt.While): R;
   }
 
   export class Block extends Stmt {
@@ -82,30 +81,18 @@ export namespace Stmt {
       return visitor.visitVarStmt(this);
     }
   }
-  export class Literal extends Stmt {
-    readonly value: any;
+  export class While extends Stmt {
+    readonly condition: Expr;
+    readonly body: Stmt;
 
-    constructor(value: any) {
+    constructor(condition: Expr, body: Stmt) {
       super();
-      this.value = value;
+      this.condition = condition;
+      this.body = body;
     }
 
     override accept<R>(visitor: Stmt.Visitor<R>): R {
-      return visitor.visitLiteralStmt(this);
-    }
-  }
-  export class Unary extends Stmt {
-    readonly operator: Token;
-    readonly right: Expr;
-
-    constructor(operator: Token, right: Expr) {
-      super();
-      this.operator = operator;
-      this.right = right;
-    }
-
-    override accept<R>(visitor: Stmt.Visitor<R>): R {
-      return visitor.visitUnaryStmt(this);
+      return visitor.visitWhileStmt(this);
     }
   }
 }

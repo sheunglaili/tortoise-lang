@@ -32,6 +32,12 @@ function App() {
     \n} else {\
     \n  print \"a not equals 2!\";\
     \n}\
+    \n\
+    \nvar b = 0;\
+    \nwhile (b < 3) {\
+    \n  print b;\
+    \n  b = b + 1;\
+    \n}\
     "
   );
   const [outputs, setOutputs] = useState<string[]>([]);
@@ -68,8 +74,7 @@ function App() {
         height='100vh'
         value={code}
         onChange={(newCode) => {
-          setOutputs([]);
-          tortoise.run(newCode)
+          setCode(newCode);
         }}
       />
       <div
@@ -78,6 +83,16 @@ function App() {
           display: 'flex',
           flexDirection: 'column'
         }}>
+        <div style={{
+          display: 'flex'
+        }}>
+          <button onClick={() => {
+            setOutputs([]);
+            tortoise.run(code);
+          }}>
+              Run !
+          </button>
+        </div> 
         {outputs.map((output) => (
           <div>
             {output}
