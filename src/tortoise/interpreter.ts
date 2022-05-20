@@ -10,12 +10,15 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
 
   private readonly monitor: Monitor;
   private readonly printer: Printer;
-  private readonly environment: Environment;
+  private environment: Environment;
 
   constructor(monitor: Monitor, printer: Printer) {
     this.monitor = monitor;
     this.printer = printer;
     this.environment = new Environment();
+  }
+  visitBlockStmt(stmt: Stmt.Block): void {
+    this.executeBlock(stmt.statments, new Environment(this.environment));
   }
   visitAssignExpr(expr: Expr.Assign) {
     const value = this.evaluate(expr.value);
@@ -41,6 +44,18 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
   visitPrintStmt(stmt: Stmt.Print): void {
     const value = this.evaluate(stmt.expression);
     this.printer.write(`${value}`);
+  }
+
+  private executeBlock(statements: Stmt[], env: Environment) {
+    const previous = this.environment;
+    try {
+      this.environment = env;
+      for (const statement of statements) {
+        this.execute(statement);
+      }
+    } finally {
+      this.environment = previous;
+    }
   }
 
   private execute(stmt: Stmt): void {

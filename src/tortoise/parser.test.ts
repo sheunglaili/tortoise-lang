@@ -397,6 +397,66 @@ test("should parse assignment expression: var a; a = 1 + 2;", () => {
   ));
 });
 
+test("should parse block statement", () => {
+  const parser = new Parser(
+    [
+      new Token(TokenType.LEFT_BRACE, "{", null, 1),
+      new Token(TokenType.VAR, "var", null, 2),
+      new Token(TokenType.IDENTIFIER, "a", null, 2),
+      new Token(TokenType.EQUAL, "=", null, 2),
+      new Token(TokenType.NUMBER, "1", 1, 2),
+      new Token(TokenType.SEMICOLON, ";", null, 2),
+      new Token(TokenType.VAR, "var", null, 3),
+      new Token(TokenType.IDENTIFIER, "b", null, 3),
+      new Token(TokenType.EQUAL, "=", null, 3),
+      new Token(TokenType.NUMBER, "3", 3, 3),
+      new Token(TokenType.SEMICOLON, ";", null, 3),
+      new Token(TokenType.VAR, "var", null, 3),
+      new Token(TokenType.IDENTIFIER, "c", null, 3),
+      new Token(TokenType.EQUAL, "=", null, 3),
+      new Token(TokenType.SEMICOLON, ";", null, 3), // unparsable statments
+      new Token(TokenType.RIGHT_BRACE, "}", null, 5),
+      new Token(TokenType.EOF, "", null, 6)
+    ],
+    monitor
+  );
+  const stmts = parser.parse();
+  expect(stmts).toEqual([
+    new Stmt.Block([
+      new Stmt.Var(
+        new Token(TokenType.IDENTIFIER, "a", null, 2),
+        new Expr.Literal(1)
+      ),
+      new Stmt.Var(
+        new Token(TokenType.IDENTIFIER, "b", null, 3),
+        new Expr.Literal(3)
+      )
+    ])
+  ]);
+});
+
+test("should exit if no right braces is defined for open left braces", () => {
+  const parser = new Parser(
+    [
+      new Token(TokenType.LEFT_BRACE, "{", null, 1),
+      new Token(TokenType.VAR, "var", null, 2),
+      new Token(TokenType.IDENTIFIER, "a", null, 2),
+      new Token(TokenType.EQUAL, "=", null, 2),
+      new Token(TokenType.NUMBER, "1", 1, 2),
+      new Token(TokenType.SEMICOLON, ";", null, 2),
+      new Token(TokenType.VAR, "var", null, 3),
+      new Token(TokenType.IDENTIFIER, "b", null, 3),
+      new Token(TokenType.EQUAL, "=", null, 3),
+      new Token(TokenType.NUMBER, "3", 3, 3),
+      new Token(TokenType.SEMICOLON, ";", null, 3),
+      new Token(TokenType.EOF, "", null, 4)
+    ],
+    monitor
+  );
+  const stmts = parser.parse();
+  expect(stmts).toEqual([]);
+})
+
 test("should print error if expression is not ended with ;", () => {
   const parser = new Parser(
     [

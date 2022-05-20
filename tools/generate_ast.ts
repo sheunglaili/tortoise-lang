@@ -21,6 +21,7 @@ class GenerateAst {
       outDir,
       "Stmt",
       [
+        "Block      : statments: Stmt[]",
         "Expression : expression: Expr",
         "Print      : expression: Expr",
         "Var        : name: Token, initializer: Expr | null",

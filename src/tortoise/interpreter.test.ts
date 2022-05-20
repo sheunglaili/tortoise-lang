@@ -403,3 +403,38 @@ test("should be able to interpret multiple statements", () => {
   expect(printer.write).toHaveBeenNthCalledWith(1, "123");
   expect(printer.write).toHaveBeenNthCalledWith(2, "456");
 })
+
+test("should get variable in enclosing scope if not defined in current scope", () => {
+  interpreter.interpret([
+    new Stmt.Var(
+      new Token(TokenType.IDENTIFIER, "a", null, 1),
+      new Expr.Literal(1)
+    ),
+    new Stmt.Block([
+      new Stmt.Print(new Expr.Variable(new Token(TokenType.IDENTIFIER, "a", null, 2)))
+    ])
+  ]);
+
+  expect(printer.write).toBeCalledWith("1");
+});
+
+test("should restore to enclosing scope after finishing block", () => {
+  interpreter.interpret([
+    new Stmt.Var(
+      new Token(TokenType.IDENTIFIER, "a", null, 1),
+      new Expr.Literal(1)
+    ),
+    new Stmt.Block([
+      new Stmt.Var(
+        new Token(TokenType.IDENTIFIER, "a", null, 2),
+        new Expr.Literal(2)
+      ),
+      new Stmt.Print(new Expr.Variable(new Token(TokenType.IDENTIFIER, "a", null, 3)))
+    ]),
+    new Stmt.Print(
+      new Expr.Variable(new Token(TokenType.IDENTIFIER, "a", null, 4)) 
+    )
+  ]);
+  expect(printer.write).toHaveBeenNthCalledWith(1, "2");
+  expect(printer.write).toHaveBeenNthCalledWith(2, "1");
+})

@@ -7,6 +7,7 @@ export abstract class Stmt {
 
 export namespace Stmt {
   export interface Visitor<R> {
+    visitBlockStmt(stmt: Stmt.Block): R;
     visitExpressionStmt(stmt: Stmt.Expression): R;
     visitPrintStmt(stmt: Stmt.Print): R;
     visitVarStmt(stmt: Stmt.Var): R;
@@ -14,6 +15,18 @@ export namespace Stmt {
     visitUnaryStmt(stmt: Stmt.Unary): R;
   }
 
+  export class Block extends Stmt {
+    readonly statments: Stmt[];
+
+    constructor(statments: Stmt[]) {
+      super();
+      this.statments = statments;
+    }
+
+    override accept<R>(visitor: Stmt.Visitor<R>): R {
+      return visitor.visitBlockStmt(this);
+    }
+  }
   export class Expression extends Stmt {
     readonly expression: Expr;
 
