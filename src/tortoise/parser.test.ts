@@ -476,6 +476,72 @@ test("should print error if expression is not ended with ;", () => {
   );
 });
 
+test.each([
+  {
+    description: "if-else",
+    tokens: [
+      new Token(TokenType.IF, "if", null, 1),
+      new Token(TokenType.LEFT_PAREN, "(", null, 1),
+      new Token(TokenType.TRUE, "true", true, 1),
+      new Token(TokenType.RIGHT_PAREN, ")", null, 1),
+      new Token(TokenType.PRINT, "print", null, 2),
+      new Token(TokenType.STRING, "hello", "hello", 2),
+      new Token(TokenType.SEMICOLON, ";", null, 2),
+      new Token(TokenType.ELSE, "else", null, 3),
+      new Token(TokenType.PRINT, "print", null, 4),
+      new Token(TokenType.STRING, "world", "world", 4),
+      new Token(TokenType.SEMICOLON, ";", null, 4),
+      new Token(TokenType.EOF, "", null, 4)
+    ],
+    expected: [
+      new Stmt.If(
+        new Expr.Literal(true),
+        new Stmt.Print(new Expr.Literal("hello")),
+        new Stmt.Print(new Expr.Literal("world"))
+      )
+    ]
+  },
+  {
+    description: "if",
+    tokens: [
+      new Token(TokenType.IF, "if", null, 1),
+      new Token(TokenType.LEFT_PAREN, "(", null, 1),
+      new Token(TokenType.TRUE, "true", true, 1),
+      new Token(TokenType.RIGHT_PAREN, ")", null, 1),
+      new Token(TokenType.PRINT, "print", null, 2),
+      new Token(TokenType.STRING, "hello", "hello", 2),
+      new Token(TokenType.SEMICOLON, ";", null, 2),
+      new Token(TokenType.EOF, "", null, 3)
+    ],
+    expected: [
+      new Stmt.If(
+        new Expr.Literal(true),
+        new Stmt.Print(new Expr.Literal("hello")),
+        null
+      )
+    ]
+  },
+  {
+    description: "broken condition - skipped condition",
+    tokens: [
+      new Token(TokenType.IF, "if", null, 1),
+      new Token(TokenType.TRUE, "true", true, 1),
+      new Token(TokenType.PRINT, "print", null, 2),
+      new Token(TokenType.STRING, "hello", "hello", 2),
+      new Token(TokenType.SEMICOLON, ";", null, 2),
+      new Token(TokenType.EOF, "", null, 3)
+    ],
+    expected: [
+      new Stmt.Print(new Expr.Literal("hello")),
+    ]
+  }
+])("should parse if statement", ({ tokens, expected }) => {
+  const parser = new Parser(tokens, monitor);
+
+  const statments = parser.parse();
+  expect(statments).toEqual(expected)
+})
+
 test("should print error if var declaration is not ended with ;", () => {
   const parser = new Parser(
     [

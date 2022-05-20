@@ -3,9 +3,9 @@ import { Token } from "./token";
 
 export class Environment {
 
-  private readonly enclosing?: Environment;
+  private readonly enclosing: Environment | null;
 
-  constructor(enclosing?: Environment) {
+  constructor(enclosing: Environment | null = null) {
     this.enclosing = enclosing
   }
 

@@ -17,6 +17,13 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
     this.printer = printer;
     this.environment = new Environment();
   }
+  visitIfStmt(stmt: Stmt.If): void {
+    if (this.isTruthy(this.evaluate(stmt.condition))) {
+      this.execute(stmt.thenBranch);
+    } else if (stmt.elseBranch) {
+      this.execute(stmt.elseBranch);
+    }
+  }
   visitBlockStmt(stmt: Stmt.Block): void {
     this.executeBlock(stmt.statments, new Environment(this.environment));
   }

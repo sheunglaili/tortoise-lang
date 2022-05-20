@@ -9,7 +9,8 @@ import { Stmt } from "./stmt";
  * program        → declaration* EOF ;
  * declaration    → varDecl | statement ;
  * varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
- * statement      → exprStmt | printStmt | block ;
+ * statement      → exprStmt | ifStmt | printStmt | block ;
+ * ifStmt         → "if" "(" expression ")" statement ( "else" statement )?;
  * block          → "{" declaration* "}"
  * exprStmt       → expression ";" ;
  * printStmt      → "print" expression ";" ;
@@ -203,7 +204,21 @@ export class Parser {
     return new Stmt.Print(value);
   }
 
+  private ifStatement(): Stmt {
+    this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
+    const condition: Expr = this.expression();
+    this.consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.");
+
+    const thenBranch = this.statement();
+    const elseBracnch = this.match(TokenType.ELSE) 
+      ? this.statement()
+      : null;
+    
+    return new Stmt.If(condition, thenBranch, elseBracnch);
+  }
+
   private statement(): Stmt {
+    if (this.match(TokenType.IF)) return this.ifStatement();
     if (this.match(TokenType.PRINT)) return this.printStatement();
     if (this.match(TokenType.LEFT_BRACE)) return this.block();
 

@@ -9,6 +9,7 @@ export namespace Stmt {
   export interface Visitor<R> {
     visitBlockStmt(stmt: Stmt.Block): R;
     visitExpressionStmt(stmt: Stmt.Expression): R;
+    visitIfStmt(stmt: Stmt.If): R;
     visitPrintStmt(stmt: Stmt.Print): R;
     visitVarStmt(stmt: Stmt.Var): R;
     visitLiteralStmt(stmt: Stmt.Literal): R;
@@ -37,6 +38,22 @@ export namespace Stmt {
 
     override accept<R>(visitor: Stmt.Visitor<R>): R {
       return visitor.visitExpressionStmt(this);
+    }
+  }
+  export class If extends Stmt {
+    readonly condition: Expr;
+    readonly thenBranch: Stmt;
+    readonly elseBranch: Stmt | null;
+
+    constructor(condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null) {
+      super();
+      this.condition = condition;
+      this.thenBranch = thenBranch;
+      this.elseBranch = elseBranch;
+    }
+
+    override accept<R>(visitor: Stmt.Visitor<R>): R {
+      return visitor.visitIfStmt(this);
     }
   }
   export class Print extends Stmt {

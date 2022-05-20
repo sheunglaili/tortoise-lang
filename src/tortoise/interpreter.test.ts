@@ -437,4 +437,36 @@ test("should restore to enclosing scope after finishing block", () => {
   ]);
   expect(printer.write).toHaveBeenNthCalledWith(1, "2");
   expect(printer.write).toHaveBeenNthCalledWith(2, "1");
+});
+
+test.each([
+  {
+    description: "should run thenBranch statements", 
+    statements: [
+      new Stmt.If(
+        new Expr.Literal(true),
+        new Stmt.Print(new Expr.Literal("true")),
+        new Stmt.Print(new Expr.Literal("false"))
+      )
+    ],
+    assertion: () => {
+      expect(printer.write).toBeCalledWith("true")
+    }
+  },
+  {
+    description: "should run elseBranch statements", 
+    statements: [
+      new Stmt.If(
+        new Expr.Literal(false),
+        new Stmt.Print(new Expr.Literal("true")),
+        new Stmt.Print(new Expr.Literal("false"))
+      )
+    ],
+    assertion: () => {
+      expect(printer.write).toBeCalledWith("false")
+    }
+  }
+])("should interpret if-else statment: $description", ({ statements, assertion }) => {
+  interpreter.interpret(statements);
+  assertion();
 })
