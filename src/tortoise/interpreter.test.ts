@@ -208,6 +208,56 @@ test.each([
 
 test.each([
   {
+    description: "false and true",
+    input: new Expr.Logical(
+      new Expr.Literal(false),
+      new Token(TokenType.AND, "and", null, 1),
+      new Expr.Literal(true)
+    ),
+    expected: false
+  },
+  {
+    description: "false and false",
+    input: new Expr.Logical(
+      new Expr.Literal(false),
+      new Token(TokenType.AND, "and", null, 1),
+      new Expr.Literal(false)
+    ),
+    expected: false
+  },
+  {
+    description: "true and false",
+    input: new Expr.Logical(
+      new Expr.Literal(true),
+      new Token(TokenType.AND, "and", null, 1),
+      new Expr.Literal(false)
+    ),
+    expected: false
+  },
+  {
+    description: "true or false",
+    input: new Expr.Logical(
+      new Expr.Literal(true),
+      new Token(TokenType.OR, "or", null, 1),
+      new Expr.Literal(false)
+    ),
+    expected: true
+  }, 
+  {
+    description: "false or true",
+    input: new Expr.Logical(
+      new Expr.Literal(false),
+      new Token(TokenType.OR, "or", null, 1),
+      new Expr.Literal(true)
+    ),
+    expected: true
+  }
+])("visit logical expression: $description should intepret value: $expected", ({ input, expected }) => {
+  expect(interpreter.visitLogicalExpr(input)).toEqual(expected);
+});
+
+test.each([
+  {
     input: new Expr.Assign(
       new Token(
         TokenType.IDENTIFIER,
@@ -432,7 +482,7 @@ test("should restore to enclosing scope after finishing block", () => {
       new Stmt.Print(new Expr.Variable(new Token(TokenType.IDENTIFIER, "a", null, 3)))
     ]),
     new Stmt.Print(
-      new Expr.Variable(new Token(TokenType.IDENTIFIER, "a", null, 4)) 
+      new Expr.Variable(new Token(TokenType.IDENTIFIER, "a", null, 4))
     )
   ]);
   expect(printer.write).toHaveBeenNthCalledWith(1, "2");
@@ -441,7 +491,7 @@ test("should restore to enclosing scope after finishing block", () => {
 
 test.each([
   {
-    description: "should run thenBranch statements", 
+    description: "should run thenBranch statements",
     statements: [
       new Stmt.If(
         new Expr.Literal(true),
@@ -454,7 +504,7 @@ test.each([
     }
   },
   {
-    description: "should run elseBranch statements", 
+    description: "should run elseBranch statements",
     statements: [
       new Stmt.If(
         new Expr.Literal(false),
@@ -469,4 +519,4 @@ test.each([
 ])("should interpret if-else statment: $description", ({ statements, assertion }) => {
   interpreter.interpret(statements);
   assertion();
-})
+});

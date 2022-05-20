@@ -361,9 +361,10 @@ test.each([
   expect((stmt as Stmt.Expression).expression).toEqual(expected);
 });
 
-test("should parse assignment expression: var a; a = 1 + 2;", () => {
-  const parser = new Parser(
-    [
+test.each([
+  {
+    expression: `var a; a = 1 + 2;`,
+    tokens: [
       new Token(TokenType.VAR, "var", null, 1),
       new Token(TokenType.IDENTIFIER, "a", null, 1),
       new Token(TokenType.SEMICOLON, ";", null, 1),
@@ -375,26 +376,99 @@ test("should parse assignment expression: var a; a = 1 + 2;", () => {
       new Token(TokenType.SEMICOLON, ";", null, 1),
       new Token(TokenType.EOF, "", null, 1)
     ],
-    monitor
-  );
+    assertion: (stmts: Stmt[]) => {
+      expect(stmts[0] instanceof Stmt.Var).toEqual(true);
+      const varStmt = stmts[0] as Stmt.Var;
+      expect(varStmt.name).toEqual(new Token(TokenType.IDENTIFIER, "a", null, 1))
+      expect(varStmt.initializer).toEqual(null);
+
+      expect(stmts[1] instanceof Stmt.Expression).toEqual(true);
+      const assignStmt = stmts[1] as Stmt.Expression;
+      expect(assignStmt.expression).toEqual(new Expr.Assign(
+        new Token(TokenType.IDENTIFIER, "a", null, 1),
+        new Expr.Binary(
+          new Expr.Literal(1),
+          new Token(TokenType.PLUS, "+", null, 1),
+          new Expr.Literal(2)
+        )
+      ));
+    }
+  },
+  {
+    expression: `var a = 1 or 2;`,
+    tokens: [
+      new Token(TokenType.VAR, "var", null, 1),
+      new Token(TokenType.IDENTIFIER, "a", null, 1),
+      new Token(TokenType.EQUAL, "=", null, 1),
+      new Token(TokenType.NUMBER, "1", 1, 1),
+      new Token(TokenType.OR, "or", null, 1),
+      new Token(TokenType.NUMBER, "2", 2, 1),
+      new Token(TokenType.SEMICOLON, ";", null, 1),
+      new Token(TokenType.EOF, "", null, 1)
+    ],
+    assertion: (stmts: Stmt[]) => {
+      expect(stmts[0] instanceof Stmt.Var).toEqual(true);
+      const varStmt = stmts[0] as Stmt.Var;
+      expect(varStmt.name).toEqual(new Token(TokenType.IDENTIFIER, "a", null, 1));
+      expect(varStmt.initializer).toEqual(new Expr.Logical(
+        new Expr.Literal(1),
+        new Token(TokenType.OR, "or", null, 1),
+        new Expr.Literal(2)
+      ));
+    }
+  },
+  {
+    expression: `var a = 1 and 2;`,
+    tokens: [
+      new Token(TokenType.VAR, "var", null, 1),
+      new Token(TokenType.IDENTIFIER, "a", null, 1),
+      new Token(TokenType.EQUAL, "=", null, 1),
+      new Token(TokenType.NUMBER, "1", 1, 1),
+      new Token(TokenType.AND, "and", null, 1),
+      new Token(TokenType.NUMBER, "2", 2, 1),
+      new Token(TokenType.SEMICOLON, ";", null, 1),
+      new Token(TokenType.EOF, "", null, 1)
+    ],
+    assertion: (stmts: Stmt[]) => {
+      expect(stmts[0] instanceof Stmt.Var).toEqual(true);
+      const varStmt = stmts[0] as Stmt.Var;
+      expect(varStmt.name).toEqual(new Token(TokenType.IDENTIFIER, "a", null, 1));
+      expect(varStmt.initializer).toEqual(new Expr.Logical(
+        new Expr.Literal(1),
+        new Token(TokenType.AND, "and", null, 1),
+        new Expr.Literal(2)
+      ));
+    }
+  },
+  {
+    expression: `var a = 1 == 2;`,
+    tokens: [
+      new Token(TokenType.VAR, "var", null, 1),
+      new Token(TokenType.IDENTIFIER, "a", null, 1),
+      new Token(TokenType.EQUAL, "=", null, 1),
+      new Token(TokenType.NUMBER, "1", 1, 1),
+      new Token(TokenType.EQUAL_EQUAL, "==", null, 1),
+      new Token(TokenType.NUMBER, "2", 2, 1),
+      new Token(TokenType.SEMICOLON, ";", null, 1),
+      new Token(TokenType.EOF, "", null, 1)
+    ],
+    assertion: (stmts: Stmt[]) => {
+      expect(stmts[0] instanceof Stmt.Var).toEqual(true);
+      const varStmt = stmts[0] as Stmt.Var;
+      expect(varStmt.name).toEqual(new Token(TokenType.IDENTIFIER, "a", null, 1));
+      expect(varStmt.initializer).toEqual(new Expr.Logical(
+        new Expr.Literal(1),
+        new Token(TokenType.EQUAL_EQUAL, "==", null, 1),
+        new Expr.Literal(2)
+      ));
+    }
+  }
+])("should parse assignment expression: $expression", ({ tokens, assertion }) => {
+  const parser = new Parser(tokens, monitor);
 
   const stmts = parser.parse();
 
-  expect(stmts[0] instanceof Stmt.Var).toEqual(true);
-  const varStmt = stmts[0] as Stmt.Var;
-  expect(varStmt.name).toEqual(new Token(TokenType.IDENTIFIER, "a", null, 1))
-  expect(varStmt.initializer).toEqual(null);
-
-  expect(stmts[1] instanceof Stmt.Expression).toEqual(true);
-  const assignStmt = stmts[1] as Stmt.Expression;
-  expect(assignStmt.expression).toEqual(new Expr.Assign(
-    new Token(TokenType.IDENTIFIER, "a", null, 1),
-    new Expr.Binary(
-      new Expr.Literal(1),
-      new Token(TokenType.PLUS, "+", null, 1),
-      new Expr.Literal(2)
-    )
-  ));
+  assertion(stmts);
 });
 
 test("should parse block statement", () => {

@@ -1,6 +1,9 @@
 import { Expr } from "tortoise/expr";
 
 export class AstPrinter implements Expr.Visitor<string> {
+  visitLogicalExpr(expr: Expr.Logical): string {
+    throw new Error("Method not implemented.");
+  }
   visitAssignExpr(expr: Expr.Assign): string {
     throw new Error("Method not implemented.");
   }

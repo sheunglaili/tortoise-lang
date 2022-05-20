@@ -10,6 +10,7 @@ export namespace Expr {
     visitBinaryExpr(expr: Expr.Binary): R;
     visitGroupingExpr(expr: Expr.Grouping): R;
     visitLiteralExpr(expr: Expr.Literal): R;
+    visitLogicalExpr(expr: Expr.Logical): R;
     visitUnaryExpr(expr: Expr.Unary): R;
     visitVariableExpr(expr: Expr.Variable): R;
   }
@@ -66,6 +67,22 @@ export namespace Expr {
 
     override accept<R>(visitor: Expr.Visitor<R>): R {
       return visitor.visitLiteralExpr(this);
+    }
+  }
+  export class Logical extends Expr {
+    readonly left: Expr;
+    readonly operator: Token;
+    readonly right: Expr;
+
+    constructor(left: Expr, operator: Token, right: Expr) {
+      super();
+      this.left = left;
+      this.operator = operator;
+      this.right = right;
+    }
+
+    override accept<R>(visitor: Expr.Visitor<R>): R {
+      return visitor.visitLogicalExpr(this);
     }
   }
   export class Unary extends Expr {

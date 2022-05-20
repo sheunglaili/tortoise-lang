@@ -11,6 +11,7 @@ class GenerateAst {
         "Binary   : left: Expr, operator: Token, right: Expr",
         "Grouping : express: Expr",
         "Literal  : value: any",
+        "Logical  : left: Expr, operator: Token, right: Expr",
         "Unary    : operator: Token, right: Expr",
         "Variable : name: Token",
       ],

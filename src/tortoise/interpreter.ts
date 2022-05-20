@@ -17,6 +17,18 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
     this.printer = printer;
     this.environment = new Environment();
   }
+  
+  visitLogicalExpr(expr: Expr.Logical) {
+    const left = this.evaluate(expr.left);
+
+    if (expr.operator.type == TokenType.OR) {
+      if (this.isTruthy(left)) return left;
+    } else {
+      if (!this.isTruthy(left)) return left;
+    }
+
+    return this.evaluate(expr.right);
+  }
   visitIfStmt(stmt: Stmt.If): void {
     if (this.isTruthy(this.evaluate(stmt.condition))) {
       this.execute(stmt.thenBranch);

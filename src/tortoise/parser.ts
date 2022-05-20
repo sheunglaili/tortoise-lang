@@ -18,7 +18,9 @@ import { Stmt } from "./stmt";
  * Complete Expression grammer
  * 
  * expression     → assignment ;
- * assignment     → IDENTIFIER "=" assignment | equality ;
+ * assignment     → IDENTIFIER "=" assignment | logic_or ;
+ * logic_or       → logic_and ( "or" logic_and )* ;
+ * logic_and      → equality ( "and" equality )* ;
  * equality       → comparison ( ( "!=" | "==" ) comparison )* ;
  * comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
  * term           → factor ( ( "-" | "+" ) factor )* ;
@@ -159,7 +161,7 @@ export class Parser {
   }
 
   private assignment(): Expr {
-    const expr = this.equality();
+    const expr = this.or();
 
     if (this.match(TokenType.EQUAL)) {
       const equals = this.previous();
@@ -178,6 +180,30 @@ export class Parser {
 
   private expression(): Expr {
     return this.assignment();
+  }
+
+  private or():  Expr {
+   let expr = this.and(); 
+
+   while (this.match(TokenType.OR)) {
+     const operator = this.previous();
+     const right = this.and();
+     expr = new Expr.Logical(expr, operator, right)
+   }
+
+   return expr;
+  }
+
+  private and(): Expr {
+    let expr = this.equality();
+
+    while (this.match(TokenType.AND)) {
+      const operator = this.previous();
+      const right = this.equality();
+      expr = new Expr.Logical(expr, operator, right)
+    }
+
+    return expr;
   }
 
   private block(): Stmt {
