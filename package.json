@@ -29,7 +29,9 @@
     "moduleNameMapper": {
       "tortoise/(.*)": "<rootDir>/src/tortoise/$1"
     },
-    "collectCoverageFrom": ["src/tortoise/**/*.{ts,tsx,js,jsx}"]
+    "collectCoverageFrom": [
+      "src/tortoise/**/*.{ts,tsx,js,jsx}"
+    ]
   },
   "browserslist": {
     "production": [

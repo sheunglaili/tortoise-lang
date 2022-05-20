@@ -1,10 +1,39 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import Split from 'react-split'
 import Tortoise, { PassThroughtPrinter } from '../tortoise';
 
 function App() {
-  const [code, setCode] = useState(`// Your first Lox program!\nprint "Hello, world!";`);
+  // TODO: come up with a better way to do template literal
+  const [code, setCode] = useState(
+    "// Your first Tortoise program!\
+    \nprint \"Hello, world!\";\
+    \n\
+    \n// data types \
+    \n\"abc\"; // string\
+    \n123; // number\
+    \n\
+    \n// variable definition\
+    \nvar a = 123;\
+    \n\
+    \n// binary operator\
+    \na == 2;\
+    \na != 2;\
+    \na >= 2;\
+    \na <= 2;\
+    \n\
+    \n// logical operator\
+    \na and 2;\
+    \na or 2;\
+    \n\
+    \n// control-flow\
+    \nif (a == 2) {\
+    \n  print \"a equals 2!\";\
+    \n} else {\
+    \n  print \"a not equals 2!\";\
+    \n}\
+    "
+  );
   const [outputs, setOutputs] = useState<string[]>([]);
 
   const tortoise = useMemo(() => {
