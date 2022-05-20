@@ -9,7 +9,8 @@ import { Stmt } from "./stmt";
  * program        → declaration* EOF ;
  * declaration    → varDecl | statement ;
  * varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
- * statement      → exprStmt | ifStmt | printStmt | block ;
+ * statement      → exprStmt | forStmt | ifStmt | printStmt | whileStmt | block ;
+ * forStmt        → "for" "(" ( varDecl | exprStmt | ; ) expression? ";" expression? ")" statement ;
  * whileStmt      → "while" "(" expression ")" statement ;
  * ifStmt         → "if" "(" expression ")" statement ( "else" statement )?;
  * block          → "{" declaration* "}"
@@ -253,7 +254,48 @@ export class Parser {
     return new Stmt.While(condition, body);
   }
 
+  private forStatement(): Stmt {
+    this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
+    
+    let initialiser: Stmt | null; 
+    if (this.match(TokenType.SEMICOLON)) {
+      initialiser = null
+    } else if (this.match(TokenType.VAR)) {
+      initialiser = this.varDeclaration();
+    } else {
+      initialiser = this.expressionStatement();
+    }
+
+    let condition = !this.check(TokenType.SEMICOLON) ? this.expression() : null;
+    this.consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
+
+    const increment = !this.check(TokenType.RIGHT_PAREN) ? this.expression() : null;
+    this.consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
+
+    let body = this.statement();
+
+    if (increment != null) {
+      body = new Stmt.Block([
+        body,
+        new Stmt.Expression(increment)
+      ]);
+    }
+
+    if (condition == null) condition = new Expr.Literal(true);
+    body = new Stmt.While(condition, body);
+
+    if (initialiser != null) {
+      body = new Stmt.Block([
+        initialiser, 
+        body
+      ]);
+    }
+
+    return body;
+  }
+
   private statement(): Stmt {
+    if (this.match(TokenType.FOR)) return this.forStatement();
     if (this.match(TokenType.IF)) return this.ifStatement();
     if (this.match(TokenType.PRINT)) return this.printStatement();
     if (this.match(TokenType.WHILE)) return this.whileStatement();

@@ -1,3 +1,4 @@
+import { parse } from "path";
 import { Expr } from "./expr";
 import { Monitor } from "./monitor";
 import { Parser } from "./parser";
@@ -836,3 +837,147 @@ test("factor expression should have higher priority than term expression", () =>
     )
   );
 });
+
+test.each([
+  {
+    description: "while statement with incremental",
+    tokens: [
+      new Token(TokenType.FOR, "for", null, 1),
+      new Token(TokenType.LEFT_PAREN, "(", null, 1),
+      new Token(TokenType.VAR, "var", null, 1),
+      new Token(TokenType.IDENTIFIER, "i", null, 1),
+      new Token(TokenType.EQUAL, "=", null, 1),
+      new Token(TokenType.NUMBER, "0", 0, 1), 
+      new Token(TokenType.SEMICOLON, ";", null, 1),
+      new Token(TokenType.IDENTIFIER, "i", null, 1),
+      new Token(TokenType.LESS_EQUAL, "<=", null, 1),
+      new Token(TokenType.NUMBER, "10", 10, 1), 
+      new Token(TokenType.SEMICOLON, ";", null, 1), 
+      new Token(TokenType.IDENTIFIER, "i", null, 1),
+      new Token(TokenType.EQUAL, "=", null, 1),
+      new Token(TokenType.IDENTIFIER, "i", null, 1), 
+      new Token(TokenType.PLUS, "+", null, 1),
+      new Token(TokenType.NUMBER, "1", 1, 1), 
+      new Token(TokenType.RIGHT_PAREN, ")", null, 1),
+      new Token(TokenType.PRINT, "print", null, 1),
+      new Token(TokenType.IDENTIFIER, "i", null, 1),
+      new Token(TokenType.SEMICOLON, ";", null, 1),
+      new Token(TokenType.EOF, "", null, 1)
+    ],
+    expected: [
+      new Stmt.Block([
+        new Stmt.Var(
+          new Token(TokenType.IDENTIFIER, "i", null, 1),
+          new Expr.Literal(0)
+        ),
+        new Stmt.While(
+          new Expr.Binary(
+            new Expr.Variable(
+              new Token(TokenType.IDENTIFIER, "i", null, 1)
+            ),
+            new Token(TokenType.LESS_EQUAL, "<=", null, 1),
+            new Expr.Literal(10)
+          ),
+          new Stmt.Block([
+            new Stmt.Print(
+              new Expr.Variable(
+                new Token(TokenType.IDENTIFIER, "i", null, 1)
+              )
+            ),
+            new Stmt.Expression(
+              new Expr.Assign(
+                new Token(TokenType.IDENTIFIER, "i", null, 1),
+                new Expr.Binary(
+                  new Expr.Variable(new Token(TokenType.IDENTIFIER, "i", null, 1)),
+                  new Token(TokenType.PLUS, "+", null, 1),
+                  new Expr.Literal(1)
+                )
+              )
+            )
+          ])
+        )
+      ])
+    ]
+  },
+  {
+    description: "while statement with only initialiser & condition", 
+    tokens: [
+      new Token(TokenType.FOR, "for", null, 1),
+      new Token(TokenType.LEFT_PAREN, "(", null, 1),
+      new Token(TokenType.VAR, "var", null, 1),
+      new Token(TokenType.IDENTIFIER, "i", null, 1),
+      new Token(TokenType.EQUAL, "=", null, 1),
+      new Token(TokenType.NUMBER, "0", 0, 1), 
+      new Token(TokenType.SEMICOLON, ";", null, 1),
+      new Token(TokenType.IDENTIFIER, "i", null, 1),
+      new Token(TokenType.LESS_EQUAL, "<=", null, 1),
+      new Token(TokenType.NUMBER, "10", 10, 1), 
+      new Token(TokenType.SEMICOLON, ";", null, 1), 
+      new Token(TokenType.RIGHT_PAREN, ")", null, 1),
+      new Token(TokenType.PRINT, "print", null, 1),
+      new Token(TokenType.IDENTIFIER, "i", null, 1),
+      new Token(TokenType.SEMICOLON, ";", null, 1),
+      new Token(TokenType.EOF, "", null, 1)
+    ],
+    expected: [
+      new Stmt.Block([
+        new Stmt.Var(
+          new Token(TokenType.IDENTIFIER, "i", null, 1),
+          new Expr.Literal(0)
+        ),
+        new Stmt.While(
+          new Expr.Binary(
+            new Expr.Variable(
+              new Token(TokenType.IDENTIFIER, "i", null, 1)
+            ),
+            new Token(TokenType.LESS_EQUAL, "<=", null, 1),
+            new Expr.Literal(10)
+          ),
+          new Stmt.Print(
+            new Expr.Variable(
+              new Token(TokenType.IDENTIFIER, "i", null, 1)
+            )
+          )
+        )
+      ])
+    ]
+  },
+  {
+    description: "while statement with only initialiser", 
+    tokens: [
+      new Token(TokenType.FOR, "for", null, 1),
+      new Token(TokenType.LEFT_PAREN, "(", null, 1),
+      new Token(TokenType.VAR, "var", null, 1),
+      new Token(TokenType.IDENTIFIER, "i", null, 1),
+      new Token(TokenType.EQUAL, "=", null, 1),
+      new Token(TokenType.NUMBER, "0", 0, 1), 
+      new Token(TokenType.SEMICOLON, ";", null, 1),
+      new Token(TokenType.SEMICOLON, ";", null, 1),
+      new Token(TokenType.RIGHT_PAREN, ")", null, 1),
+      new Token(TokenType.PRINT, "print", null, 1),
+      new Token(TokenType.IDENTIFIER, "i", null, 1),
+      new Token(TokenType.SEMICOLON, ";", null, 1),
+      new Token(TokenType.EOF, "", null, 1)
+    ],
+    expected: [
+      new Stmt.Block([
+        new Stmt.Var(
+          new Token(TokenType.IDENTIFIER, "i", null, 1),
+          new Expr.Literal(0)
+        ),
+        new Stmt.While(
+          new Expr.Literal(true),
+          new Stmt.Print(
+            new Expr.Variable(
+              new Token(TokenType.IDENTIFIER, "i", null, 1)
+            )
+          )
+        )
+      ])
+    ]
+  }
+])("should turn for statement into while statement: $description", ({ tokens, expected}) => {
+  const parser = new Parser(tokens, monitor);
+  const stmts = parser.parse();
+  expect(stmts).toEqual(expected);
+})

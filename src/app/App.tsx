@@ -33,10 +33,16 @@ function App() {
     \n  print \"a not equals 2!\";\
     \n}\
     \n\
+    \n// while-loop\
     \nvar b = 0;\
     \nwhile (b < 3) {\
     \n  print b;\
     \n  b = b + 1;\
+    \n}\
+    \n\
+    \n// for-loop\
+    \nfor (var i = 0; i < 10; i = i + 1) {\
+    \n   print i;\
     \n}\
     "
   );
