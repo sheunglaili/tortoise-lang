@@ -173,7 +173,7 @@ test.each([
   {
     input: new Expr.Binary(
       new Expr.Literal(123),
-      new Token(TokenType.EQUAL, "==", null, 1),
+      new Token(TokenType.EQUAL_EQUAL, "==", null, 1),
       new Expr.Literal(456)
     ),
     expected: false
@@ -181,7 +181,7 @@ test.each([
   {
     input: new Expr.Binary(
       new Expr.Literal(123),
-      new Token(TokenType.EQUAL, "==", null, 1),
+      new Token(TokenType.EQUAL_EQUAL, "==", null, 1),
       new Expr.Literal(123)
     ),
     expected: true
@@ -189,7 +189,7 @@ test.each([
   {
     input: new Expr.Binary(
       new Expr.Literal(123),
-      new Token(TokenType.BANG_EQUAL, "==", null, 1),
+      new Token(TokenType.BANG_EQUAL, "!=", null, 1),
       new Expr.Literal(456)
     ),
     expected: true
@@ -197,7 +197,7 @@ test.each([
   {
     input: new Expr.Binary(
       new Expr.Literal(123),
-      new Token(TokenType.BANG_EQUAL, "==", null, 1),
+      new Token(TokenType.BANG_EQUAL, "!=", null, 1),
       new Expr.Literal(123)
     ),
     expected: false

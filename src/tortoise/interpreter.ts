@@ -130,7 +130,7 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
       case TokenType.LESS_EQUAL:
         this.checkoutNumberOperands(expr.operator, left, right);
         return left <= right;
-      case TokenType.EQUAL:
+      case TokenType.EQUAL_EQUAL:
         return left == right;
       case TokenType.BANG_EQUAL:
         return left != right;
